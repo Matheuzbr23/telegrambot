@@ -1,36 +1,30 @@
 package telegram_bot;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
+import telegram_bot.Domain.MotorRespostas;
+import telegram_bot.Domain.TelegramConversa;
+import telegram_bot.Domain.TelegramConversas;
+import telegram_bot.Services.WeatherForecast;
+
 public class HinataBot extends TelegramLongPollingBot {
 
-	private String nome;
-	private String sobrenome;
+	public HinataBot(){
 
-	public String getNome() {
-		return nome;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	private WeatherForecast weatherForecast;
+	private TelegramConversas telegramConversas;
+	private MotorRespostas motorResposta;
+
+	public HinataBot(WeatherForecast weatherForecast, TelegramConversas telegramConversas){
+		this.weatherForecast = weatherForecast;
+		this.telegramConversas = telegramConversas;
 	}
 
-	public String getSobrenome() {
-		return sobrenome;
-	}
-
-	public void setSobrenome(String sobrenome) {
-		this.sobrenome = sobrenome;
-	}
-
+	
 	public String getBotUsername() {
 		return "HinataBot";
 	}
@@ -41,68 +35,22 @@ public class HinataBot extends TelegramLongPollingBot {
 
 	public void onUpdateReceived(Update update) {
 
-		String command = update.getMessage().getText();
+		if (!update.hasMessage() || !update.getMessage().hasText()) {
+            return;
+        }
 
-		setNome(update.getMessage().getFrom().getFirstName());
-		setSobrenome(update.getMessage().getFrom().getLastName());
+		TelegramConversa conversa = telegramConversas.getConversaByCharId(update.getMessage().getChatId());
 
-		SendMessage message = new SendMessage();
+		motorResposta = new MotorRespostas(update, conversa, this.weatherForecast);
 
-		message.setText("");
-
-		if (command.toLowerCase().equals("oi")) {
-			message.setText("oi");
-		}
-
-		Pattern pattern = Pattern.compile("tudo bem");
-		Matcher matcher = pattern.matcher(command);
-		if (matcher.find()) {
-			message.setText(message.getText() + " tudo bem e voce?");
-		}
-
-		if (command.equals("/saudacao")) {
-			Calendar cal = Calendar.getInstance();
-			int hora = cal.get(Calendar.HOUR_OF_DAY);
-
-			String retorno = "";
-			if (hora < 12) {
-				retorno = "Bom dia ";
-			} else if (hora >= 12 && hora < 18) {
-				retorno = "Boa Tarde ";
-			} else {
-				retorno = "Boa Noite ";
-			}
-			message.setText(retorno + getNomeCompleto());
-		}
-
-		if (command.equals("/meunome")) {
-			message.setText(update.getMessage().getFrom().getFirstName());
-		}
-
-		if (command.equals("/meusobrenome")) {
-			message.setText(update.getMessage().getFrom().getLastName());
-		}
-
-		if (command.equals("/meunomecompleto")) {
-			message.setText(getNomeCompleto());
-		}
-
-		message.setChatId(update.getMessage().getChatId());
+		telegramConversas.addConversaIfNotExist(conversa);
 
 		try {
-			execute(message);
+			execute(motorResposta.answerMessage());
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	private String getNomeCompleto() {
-		String nomeCompleto = getNome();
-		if (getSobrenome() != null) {
-			nomeCompleto += " " + getSobrenome();
-		}
-		return nomeCompleto;
 	}
 
 }
