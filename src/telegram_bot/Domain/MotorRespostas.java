@@ -77,6 +77,12 @@ public class MotorRespostas {
 
 			return message;
 		}
+		else if ((conversa.getStatus() == ConversaStatus.NOVA || conversa.getStatus() == ConversaStatus.COMPLETO ) && (respostaUsuario.contains("tbm") || respostaUsuario.contains("tambem") || respostaUsuario.contains("tambem") || respostaUsuario.contains("estou") || respostaUsuario.contains("também"))){
+			message.setText("<3");
+			message.setChatId(chatID);
+
+			return message;
+		}
 		else if ((conversa.getStatus() == ConversaStatus.NOVA || conversa.getStatus() == ConversaStatus.COMPLETO ) && respostaUsuario.toLowerCase().equals("oi")){
 			message.setText("Oi!");
 			message.setChatId(chatID);
