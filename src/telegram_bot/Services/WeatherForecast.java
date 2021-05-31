@@ -43,7 +43,7 @@ public class WeatherForecast {
 		String jsonWeatherForecast = null;
 		try {
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				if (response.getStatusLine().getStatusCode() != HttpStatus.SC_BAD_REQUEST){
+				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_BAD_REQUEST){
 					return "Limite de requisições diarias de previsão do tempo atingida, por favor tente novamente mais tarde.";
 				}
                 return "Infelizmente ocorreu um erro genérico ao realizar a requisição.";
