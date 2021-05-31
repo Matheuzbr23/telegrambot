@@ -33,7 +33,7 @@ public class WeatherForecast {
 
 		builder.setParameter("contentType", "json")
 			.setParameter("unitGroup", "metric")
-			.setParameter("key", "1PYNQ6AWUDJE9AFERDCHJHSXK");
+			.setParameter("key", "96EA7VXNR53RA367ATFF874TY");
 
 		HttpGet get = new HttpGet(builder.build());
 		
